@@ -1,0 +1,21 @@
+meta {
+  name: register_request
+  type: http
+  seq: 3
+}
+
+post {
+  url: http://localhost:8080/auth/register
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "username": "edwintrejo2003@gmail.com",
+    "firstName": "Caleb",
+    "lastName": "Trejo Aguiñaga",
+    "email": "etrejoa1801@alumno.ipn.mx",
+    "password": "1234"
+  }
+}
