@@ -8,7 +8,8 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:4200"})
+//@CrossOrigin(origins = {"http://localhost:4200"})
+@CrossOrigin(origins = {"http://seseaz-frontend.vercel.app"})
 public class AuthController {
 
     private final AuthService authService;

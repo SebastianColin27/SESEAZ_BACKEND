@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
+//@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = {"http://seseaz-frontend.vercel.app"})
 @RequestMapping("/api/pdf")
 
 public class PdfController {

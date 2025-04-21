@@ -13,7 +13,8 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
+//@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = {"http://seseaz-frontend.vercel.app"})
 @RequestMapping("/api/personal")
 public class PersonalController {
     @Autowired

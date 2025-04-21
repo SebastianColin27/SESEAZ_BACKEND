@@ -10,7 +10,8 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/v1")
 @RequiredArgsConstructor
-@CrossOrigin(origins = {"http://localhost:4200"})
+//@CrossOrigin(origins = {"http://localhost:4200"})
+@CrossOrigin(origins = {"http://seseaz-frontend.vercel.app"})
 public class DemoController {
 
     @PostMapping(value = "demo")
