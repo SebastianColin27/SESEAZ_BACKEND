@@ -58,7 +58,7 @@ public class SecurityConfig {
         // Métodos HTTP permitidos
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         // Cabeceras permitidas (importante incluir Authorization)
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "Access-Control-Allow-Origi"));
         // Permitir credenciales (si usas cookies/sesiones, aunque con JWT stateless es menos común necesitarla true)
         configuration.setAllowCredentials(true); // Mantenla si angular-jwt la necesita o si tienes algún caso de uso
 
