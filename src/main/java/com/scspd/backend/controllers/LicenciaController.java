@@ -15,7 +15,7 @@ import java.util.Optional;
 
 @RestController
 //@CrossOrigin(origins = "http://localhost:4200")
-@CrossOrigin(origins = {"http://seseaz-frontend.vercel.app"})
+@CrossOrigin(origins = {"https://seseaz-frontend.vercel.app"})
 @RequestMapping("/api/licencias")
 public class LicenciaController {
     @Autowired

@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @RestController
 //@CrossOrigin(origins = "http://localhost:4200")
-@CrossOrigin(origins = {"http://seseaz-frontend.vercel.app"})
+@CrossOrigin(origins = {"https://seseaz-frontend.vercel.app"})
 @RequestMapping("/api/equipos")
 public class EquipoController {
     @Autowired
