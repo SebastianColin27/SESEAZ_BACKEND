@@ -1,6 +1,7 @@
 package com.scspd.backend.config;
 
 import com.scspd.backend.user.UserRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,6 +14,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import lombok.RequiredArgsConstructor;
+
+import java.util.TimeZone;
 
 @Configuration
 @RequiredArgsConstructor
@@ -45,5 +48,10 @@ public class ApplicationConfig {
         return username -> userRepository.findByUsername(username)
                 .orElseThrow(()-> new UsernameNotFoundException("User not fournd"));
     }
+    @PostConstruct
+    public void init(){
+        TimeZone.setDefault(TimeZone.getTimeZone("America/Mexico_City")); // Usa tu zona horaria
+    }
+
 
 }

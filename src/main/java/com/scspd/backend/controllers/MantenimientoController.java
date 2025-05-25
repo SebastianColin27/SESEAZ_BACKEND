@@ -1,14 +1,17 @@
 package com.scspd.backend.controllers;
+
 import com.scspd.backend.models.Mantenimiento;
+import com.scspd.backend.repositories.EquipoRepository;
+import com.scspd.backend.repositories.MantenimientoRepository;
 import com.scspd.backend.services.MantenimientoService;
+import jakarta.validation.Valid;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-import org.bson.types.ObjectId;
 
-import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,6 +22,10 @@ import java.util.Optional;
 public class MantenimientoController {
     @Autowired
     private MantenimientoService mantenimientoService;
+    @Autowired
+    private EquipoRepository equipoRepository;
+    @Autowired
+    private MantenimientoRepository mantenimientoRepository;
 
     @PreAuthorize("hasAnyRole('ADMIN', 'LECTOR', 'MODERADOR')")
     @GetMapping
@@ -67,14 +74,16 @@ public class MantenimientoController {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'LECTOR', 'MODERADOR')")
-    @GetMapping("/asignacion/{asignacionId}")
-    public ResponseEntity<List<Mantenimiento>> obtenerMantenimientosPorAsignacion(@PathVariable ObjectId asignacionId) {
-        return ResponseEntity.ok(mantenimientoService.obtenerMantenimientosPorAsignacion(asignacionId));
+    @GetMapping("/buscar")
+    public ResponseEntity<List<Mantenimiento>> buscarPorNumeroSerie(@RequestParam String numeroSerie) {
+        List<Mantenimiento> mantenimientos = mantenimientoService.buscarMantenimientosPorNumeroSerie(numeroSerie);
+
+        if (mantenimientos.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(mantenimientos);
+        }
+
+        return ResponseEntity.ok(mantenimientos);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'LECTOR', 'MODERADOR')")
-    @GetMapping("/equipo/{equipoId}")
-    public ResponseEntity<List<Mantenimiento>> obtenerMantenimientosPorEquipo(@PathVariable ObjectId equipoId) {
-        return ResponseEntity.ok(mantenimientoService.obtenerMantenimientosPorEquipo(equipoId));
-    }
+
 }

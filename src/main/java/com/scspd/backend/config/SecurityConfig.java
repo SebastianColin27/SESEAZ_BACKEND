@@ -3,6 +3,7 @@ package com.scspd.backend.config;
 import com.scspd.backend.jwt.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.config.Customizer; // Importa Customizer
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
@@ -16,6 +17,10 @@ import org.springframework.web.cors.CorsConfigurationSource; // Importa CorsConf
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource; // Importa UrlBasedCorsConfigurationSource
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
 import java.util.Arrays; // Importa Arrays
 
 @Configuration
@@ -35,10 +40,14 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authRequest ->
                         authRequest
+
+
                                 .requestMatchers("/auth/**").permitAll()
-                           //     .requestMatchers("/api/pdf/**").permitAll()
-                                .requestMatchers("/api/**").authenticated() // Requiere autenticación para API
-                                .anyRequest().denyAll() // Deniega el resto
+                                .requestMatchers("/api/**").authenticated()
+
+
+                                .anyRequest().denyAll()
+
                 )
                 .sessionManagement(sessionManager->
                         sessionManager
@@ -46,6 +55,7 @@ public class SecurityConfig {
                 .authenticationProvider(authProvider)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
+
     }
 
     // *** AÑADE ESTE BEAN PARA CONFIGURAR CORS ***
@@ -54,7 +64,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         // Orígenes permitidos (tu frontend Angular)
         //configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200, https://seseaz-frontend.vercel.app"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "https://seseaz-frontend.vercel.app"));
         // Métodos HTTP permitidos
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         // Cabeceras permitidas (importante incluir Authorization)
@@ -67,4 +77,21 @@ public class SecurityConfig {
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
+
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins("http://localhost:4200")
+                        .allowedMethods("*")
+                        .allowedHeaders("*")
+                        .allowCredentials(true);
+            }
+        };
+    }
+
+
 }

@@ -69,13 +69,17 @@ public class AsignacionController {
         return ResponseEntity.noContent().build();
     }
 
+
     @PreAuthorize("hasAnyRole('ADMIN', 'LECTOR', 'MODERADOR')")
-    @GetMapping("/persona/{personalId}")
-    public ResponseEntity<List<Asignacion>> obtenerAsignacionesPorPersona(@PathVariable ObjectId personalId) {
-        List<Asignacion> asignaciones = asignacionService.obtenerAsignacionesPorPersona(personalId);
+    @GetMapping("/buscar")
+    public ResponseEntity<List<Asignacion>> buscarPorNumeroSerie(@RequestParam String numeroSerie) {
+        List<Asignacion> asignaciones = asignacionService.buscarAsignacionesPorNumeroSerie(numeroSerie);
+
+        if (asignaciones.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(asignaciones);
+        }
+
         return ResponseEntity.ok(asignaciones);
-
-
     }
 
 

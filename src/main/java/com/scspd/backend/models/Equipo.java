@@ -29,10 +29,12 @@ public class Equipo {
     private String modelo;
     private String procesador;
     private int ram;
-    private double almacenamiento;
+    private double HDD;
+    private double SDD;
     private Puertos  puertos;
     private String estado;
-    private String imagenUrl; // Guardar la URL de la imagen
+
+    private String imagenGridFsId;
 
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
@@ -41,6 +43,10 @@ public class Equipo {
 
 
     @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
+    @Getter
+    @Setter
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class Puertos {
         private int usb;
         private int ethernet;

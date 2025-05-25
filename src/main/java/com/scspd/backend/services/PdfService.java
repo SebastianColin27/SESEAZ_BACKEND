@@ -1,20 +1,30 @@
 package com.scspd.backend.services;
 
-import com.lowagie.text.Document;
-import com.lowagie.text.Paragraph;
+import com.lowagie.text.*;
+import com.lowagie.text.Font;
+import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
-import com.scspd.backend.models.Asignacion;
-import com.scspd.backend.models.Mantenimiento;
-import com.scspd.backend.models.Personal;
+import com.scspd.backend.models.*;
 import com.scspd.backend.repositories.AsignacionRepository;
+import com.scspd.backend.repositories.EquipoRepository;
 import com.scspd.backend.repositories.MantenimientoRepository;
+import com.scspd.backend.repositories.PersonalRepository;
 import jakarta.servlet.http.HttpServletResponse;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
+import java.awt.*;
+import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -24,8 +34,18 @@ public class PdfService {
     private AsignacionRepository asignacionRepository;
     @Autowired
     private MantenimientoRepository mantenimientoRepository;
+    @Autowired
+    private EquipoRepository equipoRepository;
+    @Autowired
+    private AsignacionService asignacionService;
+    @Autowired
+    private MantenimientoService mantenimientoService;
+    @Autowired
+    private PersonalRepository personalRepository;
 
     public void exportPdfAsignaciones(HttpServletResponse response) throws Exception {
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Disposition", "attachment; filename=asignaciones_reporte_general.pdf");
         List<Asignacion> asignaciones = asignacionRepository.findAll();
 
         Document document = new Document();
@@ -48,16 +68,19 @@ public class PdfService {
         table.addCell("Personal Asignado");
         table.addCell("Comentarios");
 
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); // Para formatear fechas
+
         for (Asignacion asignacion : asignaciones) {
             String numeroSerie = asignacion.getEquipo() != null ? asignacion.getEquipo().getNumeroSerie() : "N/A";
-            String fechaAsignacion = asignacion.getFechaAsignacion() != null ? asignacion.getFechaAsignacion().toString() : "N/A";
-            String fechaFinAsignacion = asignacion.getFechaFinAsignacion() != null ? asignacion.getFechaFinAsignacion().toString() : "N/A";
+
+            String fechaAsignacion = asignacion.getFechaAsignacion() != null ? dateFormat.format(asignacion.getFechaAsignacion()) : "N/A";
+
+            String fechaFinAsignacion = asignacion.getFechaFinAsignacion() != null ? dateFormat.format(asignacion.getFechaFinAsignacion()) : "Actual"; // Mostrar "Actual" si no ha finalizado
             String nombreEquipo = asignacion.getNombreEquipo() != null ? asignacion.getNombreEquipo() : "N/A";
 
-            String nombresPersonal = asignacion.getPersonal() != null
-                    ? asignacion.getPersonal().stream()
-                    .map(Personal::getNombre)
-                    .collect(Collectors.joining(", "))
+            // Ahora personal es un solo objeto, no una lista
+            String nombrePersonal = asignacion.getPersonal() != null
+                    ? asignacion.getPersonal().getNombre()
                     : "N/A";
 
             String comentarios = asignacion.getComentarios() != null ? asignacion.getComentarios() : "";
@@ -66,7 +89,7 @@ public class PdfService {
             table.addCell(fechaAsignacion);
             table.addCell(fechaFinAsignacion);
             table.addCell(nombreEquipo);
-            table.addCell(nombresPersonal);
+            table.addCell(nombrePersonal);
             table.addCell(comentarios);
         }
 
@@ -75,7 +98,9 @@ public class PdfService {
     }
 
 
-    public void exportPdfMantenimientos(HttpServletResponse response) throws Exception {
+        public void exportPdfMantenimientos(HttpServletResponse response) throws Exception {
+            response.setContentType("application/pdf");
+            response.setHeader("Content-Disposition", "attachment; filename=mantenimientos_reporte_general.pdf");
         List<Mantenimiento> mantenimientos = mantenimientoRepository.findAll();
 
         Document document = new Document();
@@ -97,16 +122,18 @@ public class PdfService {
         table.addCell("Equipo");
         table.addCell("No. Serie");
 
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); // Para formatear fechas
+
         for (Mantenimiento mantenimiento : mantenimientos) {
-            String fecha = mantenimiento.getFecha() != null ? mantenimiento.getFecha().toString() : "N/A";
+            String fecha = mantenimiento.getFecha() != null ? dateFormat.format(mantenimiento.getFecha()) : "N/A";
             String actividad = mantenimiento.getActividadRealizada() != null ? mantenimiento.getActividadRealizada() : "";
             String evidencia = mantenimiento.getEvidencia() != null ? mantenimiento.getEvidencia() : "";
 
-            Asignacion asignacion = mantenimiento.getAsignacion();
-            String nombreEquipo = (asignacion != null && asignacion.getNombreEquipo() != null)
-                    ? asignacion.getNombreEquipo() : "N/A";
-            String numeroSerie = (asignacion != null && asignacion.getEquipo() != null)
-                    ? asignacion.getEquipo().getNumeroSerie() : "N/A";
+            Equipo equipo = mantenimiento.getEquipo();
+            String nombreEquipo = (equipo != null && equipo.getNumeroSerie() != null)
+                    ? equipo.getNumeroSerie() : "N/A";
+            String numeroSerie = (equipo!= null && equipo.getNumeroSerie() != null)
+                    ? equipo.getNumeroSerie() : "N/A";
 
             // Celdas alineadas correctamente con los encabezados
             table.addCell(fecha);
@@ -120,4 +147,193 @@ public class PdfService {
         document.close();
     }
 
+
+
+    // Generar reporte PDF de Asignaciones por Equipo
+    public void exportPdfAsignacionesPorEquipo(HttpServletResponse response, ObjectId equipoId) throws Exception {
+        // 1. Obtener la información del equipo para el título del reporte
+        Optional<Equipo> equipoOptional = equipoRepository.findById(equipoId);
+        if (equipoOptional.isEmpty()) {
+            throw new EntityNotFoundException("No se encontró el equipo con el ID proporcionado.");
+        }
+        Equipo equipo = equipoOptional.get();
+
+        // 2. Obtener las asignaciones para este equipo
+        // Si asignacionService.obtenerAsignacionesPorEquipoId() aún usa findByEquipoId, eso está bien.
+        List<Asignacion> asignaciones = asignacionService.obtenerAsignacionesPorEquipoId(equipoId);
+
+        // 3. Crear el documento PDF
+        Document document = new Document();
+        PdfWriter.getInstance(document, response.getOutputStream());
+        document.open();
+
+        // Título del reporte
+        document.add(new Paragraph("REPORTE DE HISTORIAL DE ASIGNACIONES PARA EL EQUIPO: " + equipo.getNumeroSerie() + " (" + equipo.getModelo() + "-" + equipo.getTipo() + "-" + equipo.getColor() + ")"));
+        document.add(new Paragraph(" ")); // Espacio
+
+        // 4. Tabla con los datos de las asignaciones (Ajustada a 4 columnas si solo hay un Personal)
+        // Columnas: Fecha Asignación, Fecha Fin Asignación, Personal Asignado, Licencias Asignadas
+        PdfPTable table = new PdfPTable(5);
+        table.setWidthPercentage(100);
+        table.setWidths(new float[]{3, 3, 4, 5, 5}); // Ajusta según el contenido
+
+        // Encabezados de la tabla
+        table.addCell("Fecha Asignación");
+        table.addCell("Fecha Fin Asignación");
+        table.addCell("Personal Asignado"); // Encabezado para el personal (singular)
+        table.addCell("Licencias Asignadas");
+        table.addCell("Comentarios");
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); // Para formatear fechas
+
+        for (Asignacion asignacion : asignaciones) {
+            // Formatear fechas
+            String fechaAsignacion = asignacion.getFechaAsignacion() != null ? dateFormat.format(asignacion.getFechaAsignacion()) : "N/A";
+            String fechaFinAsignacion = asignacion.getFechaFinAsignacion() != null ? dateFormat.format(asignacion.getFechaFinAsignacion()) : "Actual"; // Mostrar "Actual" si no ha finalizado
+
+            // Obtener nombre del personal (Asumimos que personal es un objeto simple)
+            String nombrePersonal = (asignacion.getPersonal() != null && asignacion.getPersonal().getNombre() != null)
+                    ? asignacion.getPersonal().getNombre()
+                    : "Sin asignar";
+
+            // Obtener nombres de licencias (sigue siendo una lista)
+            String nombresLicencias = (asignacion.getLicencias() != null && !asignacion.getLicencias().isEmpty())
+                    ? asignacion.getLicencias().stream()
+                    .filter(l -> l != null && l.getNombreLicencia() != null)
+                    .map(Licencia::getNombreLicencia)
+                    .collect(Collectors.joining(", "))
+                    : "Sin licencias";
+
+            String comentarios = asignacion.getComentarios();
+            String observaciones = (comentarios != null && !comentarios.isEmpty())
+                    ? comentarios
+                    : "Sin comentarios";
+
+            table.addCell(fechaAsignacion);
+            table.addCell(fechaFinAsignacion);
+            table.addCell(nombrePersonal); // Añadir el nombre del personal (singular)
+            table.addCell(nombresLicencias);
+            table.addCell(observaciones);
+        }
+
+        document.add(table);
+        document.close();
+    }
+
+    //  Generar reporte PDF de Mantenimientos por Equipo
+    public void exportPdfMantenimientosPorEquipo(HttpServletResponse response, ObjectId equipoId) throws Exception {
+        // 1. Obtener la información del equipo para el título del reporte
+        Optional<Equipo> equipoOptional = equipoRepository.findById(equipoId);
+        if (equipoOptional.isEmpty()) {
+            throw new EntityNotFoundException("No se encontró el equipo con el ID proporcionado.");
+        }
+        Equipo equipo = equipoOptional.get();
+
+        // 2. Obtener los mantenimientos para este equipo
+        List<Mantenimiento> mantenimientos = mantenimientoService.obtenerMantenimientosPorEquipoId(equipoId);
+
+        // 3. Crear el documento PDF
+        Document document = new Document();
+        PdfWriter.getInstance(document, response.getOutputStream());
+        document.open();
+
+        // Título del reporte
+        document.add(new Paragraph("REPORTE DE HISTORIAL DE MANTENIMIENTOS PARA EL EQUIPO: " + equipo.getNumeroSerie() + " (" + equipo.getModelo() + "-" + equipo.getColor() + ")"));
+        document.add(new Paragraph(" ")); // Espacio
+
+        // 4. Tabla con los datos de los mantenimientos (Ajustada - SIN Personal Asignado si no existe en Mantenimiento)
+        // Columnas: Fecha, Actividad Realizada, Evidencia
+        PdfPTable table = new PdfPTable(3);
+        table.setWidthPercentage(100);
+        table.setWidths(new float[]{2, 6, 4}); // Ajusta según el contenido
+
+        // Encabezados de la tabla
+        table.addCell("Fecha");
+        table.addCell("Actividad Realizada");
+        table.addCell("Evidencia");
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); // Para formatear fechas
+
+        for (Mantenimiento mantenimiento : mantenimientos) {
+            String fecha = mantenimiento.getFecha() != null ? dateFormat.format(mantenimiento.getFecha()) : "N/A";
+            String actividad = mantenimiento.getActividadRealizada() != null ? mantenimiento.getActividadRealizada() : "";
+            String evidencia = mantenimiento.getEvidencia() != null ? mantenimiento.getEvidencia() : "";
+
+            table.addCell(fecha);
+            table.addCell(actividad);
+            table.addCell(evidencia);
+        }
+
+        document.add(table);
+        document.close();
+    }
+
+    // Generar reporte PDF de Asignaciones por Personal
+    public void exportPdfAsignacionesPorPersonal(HttpServletResponse response, ObjectId personalId) throws Exception {
+        // 1. Obtener la información del personal para el título del reporte
+        Optional<Personal> personalOptional = personalRepository.findById(personalId);
+        if (personalOptional.isEmpty()) {
+            throw new EntityNotFoundException("No se encontró el personal con el ID proporcionado.");
+        }
+        Personal personal = personalOptional.get();
+
+        // 2. Obtener las asignaciones para este personal
+        List<Asignacion> asignaciones = asignacionService.obtenerAsignacionesPorPersonalId(personalId);
+
+        // 3. Crear el documento PDF
+        Document document = new Document();
+        PdfWriter.getInstance(document, response.getOutputStream());
+        document.open();
+
+        // Título del reporte
+        document.add(new Paragraph("REPORTE DE HISTORIAL DE ASIGNACIONES DEL PERSONAL: " + personal.getNombre() + " (" + personal.getCargo() + ")"));
+        document.add(new Paragraph(" ")); // Espacio
+
+        // 4. Tabla con los datos de las asignaciones
+        // Columnas: Fecha Asignación, Fecha Fin Asignación, Equipo Asignado, Licencias Asignadas, Comentarios
+        PdfPTable table = new PdfPTable(5);
+        table.setWidthPercentage(100);
+        table.setWidths(new float[]{3, 3, 5, 5, 5}); // Ajusta según el contenido
+
+        // Encabezados de la tabla
+        table.addCell("Fecha Asignación");
+        table.addCell("Fecha Fin Asignación");
+        table.addCell("Equipo Asignado");
+        table.addCell("Licencias Asignadas");
+        table.addCell("Comentarios");
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+        for (Asignacion asignacion : asignaciones) {
+            String fechaAsignacion = asignacion.getFechaAsignacion() != null ? dateFormat.format(asignacion.getFechaAsignacion()) : "N/A";
+            String fechaFinAsignacion = asignacion.getFechaFinAsignacion() != null ? dateFormat.format(asignacion.getFechaFinAsignacion()) : "Actual";
+
+            String equipoAsignado = (asignacion.getEquipo() != null && asignacion.getEquipo().getNumeroSerie() != null)
+                    ? asignacion.getEquipo().getNumeroSerie() + " (" + asignacion.getEquipo().getModelo() + " - " + asignacion.getEquipo().getTipo()+ " - "  +asignacion.getEquipo().getColor() +")"
+                    : "Sin equipo";
+
+            String nombresLicencias = (asignacion.getLicencias() != null && !asignacion.getLicencias().isEmpty())
+                    ? asignacion.getLicencias().stream()
+                    .filter(l -> l != null && l.getNombreLicencia() != null)
+                    .map(Licencia::getNombreLicencia)
+                    .collect(Collectors.joining(", "))
+                    : "Sin licencias";
+
+            String comentarios = asignacion.getComentarios();
+            String observaciones = (comentarios != null && !comentarios.isEmpty()) ? comentarios : "Sin comentarios";
+
+            table.addCell(fechaAsignacion);
+            table.addCell(fechaFinAsignacion);
+            table.addCell(equipoAsignado);
+            table.addCell(nombresLicencias);
+            table.addCell(observaciones);
+        }
+
+        document.add(table);
+        document.close();
+    }
+
+
+
 }
+

@@ -1,4 +1,5 @@
 package com.scspd.backend.services;
+
 import com.scspd.backend.models.Asignacion;
 import com.scspd.backend.models.Equipo;
 import com.scspd.backend.models.Licencia;
@@ -7,14 +8,14 @@ import com.scspd.backend.repositories.AsignacionRepository;
 import com.scspd.backend.repositories.EquipoRepository;
 import com.scspd.backend.repositories.LicenciaRepository;
 import com.scspd.backend.repositories.PersonalRepository;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.bson.types.ObjectId;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import javax.persistence.EntityNotFoundException;
 
 @Service
 public class AsignacionService {
@@ -54,26 +55,26 @@ public class AsignacionService {
             }
         }
 
-//  Verificar y guardar personal (LISTA DE PERSONAL)
-        if (asignacion.getPersonal() != null && !asignacion.getPersonal().isEmpty()) {
-            List<Personal> personalList = new ArrayList<>();
-            for (Personal personal : asignacion.getPersonal()) {
-                if (personal.getId() == null) {
-                    // Si el ID es nulo, es una persona nueva que hay que persistir
-                    personalList.add(personalRepository.save(personal));
-                } else {
-                    // Si el ID no es nulo, hay que verificar que exista en la base de datos
-                    Optional<Personal> personalOptional = personalRepository.findById(personal.getId());
-                    if (personalOptional.isEmpty()) {
-                        throw new EntityNotFoundException("No se encontró personal con el ID proporcionado: " + personal.getId());
-                    }
-                    personalList.add(personalOptional.get()); // Add the found Personal object
-                }
-            }
-            asignacion.setPersonal(personalList); // Set the list of processed Personal objects
-        } else {
-            asignacion.setPersonal(null); // Handle the case where personal list is null or empty, setting it to null in Asignacion
+//  // Verificar y guardar personal (UN SOLO ELEMENTO)
+if (asignacion.getPersonal() != null) {
+    Personal personal = asignacion.getPersonal();
+
+    if (personal.getId() == null) {
+       // Si el ID es nulo, es una persona nueva que hay que persistir
+        personal = personalRepository.save(personal);
+    } else {
+       // Si el ID no es nulo, verificar que exista en la base de datos
+       Optional<Personal> personalOptional = personalRepository.findById(personal.getId());
+        if (personalOptional.isEmpty()) {
+            throw new EntityNotFoundException("No se encontró personal con el ID proporcionado: " + personal.getId());
         }
+        personal = personalOptional.get(); // Usamos el objeto existente
+   }
+
+    asignacion.setPersonal(personal); // Asignamos el objeto procesado
+} else {
+    asignacion.setPersonal(null); // Si no hay personal, lo dejamos en null
+}
 
         // Verificar y guardar licencias
         if (asignacion.getLicencias() != null && !asignacion.getLicencias().isEmpty()) {
@@ -120,9 +121,39 @@ public class AsignacionService {
         return asignacionRepository.findByPersonalId(personalId);
     }
 
+    public List<Asignacion> buscarPorNumeroSerie(String numeroSerie) {
+        return asignacionRepository.findByEquipoNumeroSerieContainingIgnoreCase(numeroSerie);
+    }
 
 
+    public List<Asignacion> obtenerAsignacionesPorEquipoId(ObjectId equipoId) {
+        // Opcional: Verificar si el equipo existe antes de buscar asignaciones
+        if (!equipoRepository.existsById(equipoId)) {
+            throw new EntityNotFoundException("No se encontró el equipo con el ID proporcionado.");
+        }
+        return asignacionRepository.findByEquipoId(equipoId);
+    }
+    public List<Asignacion> obtenerAsignacionesPorPersonalId(ObjectId personalId) {
+        return asignacionRepository.findByPersonalId(personalId);
+    }
 
+  /*buscar*/
+  public List<Asignacion> buscarAsignacionesPorNumeroSerie(String numeroSerie) {
+      List<Equipo> equipos = equipoRepository.findByNumeroSerieContainingIgnoreCase(numeroSerie);
+
+      if (equipos.isEmpty()) {
+          return new ArrayList<>();
+      }
+
+      // Puedes decidir si usas el primero o todos:
+      List<Asignacion> asignaciones = new ArrayList<>();
+      for (Equipo equipo : equipos) {
+          List<Asignacion> asignacionesDeEquipo = asignacionRepository.findByEquipo(equipo);
+          asignaciones.addAll(asignacionesDeEquipo);
+      }
+
+      return asignaciones;
+  }
 
 
 }

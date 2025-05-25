@@ -1,20 +1,19 @@
 package com.scspd.backend.services;
-import com.scspd.backend.models.Asignacion;
+
 import com.scspd.backend.models.Equipo;
 import com.scspd.backend.models.Mantenimiento;
 import com.scspd.backend.repositories.AsignacionRepository;
 import com.scspd.backend.repositories.EquipoRepository;
 import com.scspd.backend.repositories.MantenimientoRepository;
 import com.scspd.backend.repositories.PersonalRepository;
+import org.bson.types.ObjectId;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
-import java.util.Date;
-import org.bson.types.ObjectId;
 import java.util.List;
 import java.util.Optional;
-import javax.persistence.EntityNotFoundException;
 
 @Service
 public class MantenimientoService {
@@ -39,34 +38,24 @@ public class MantenimientoService {
     }
     public Mantenimiento guardarMantenimiento(Mantenimiento mantenimiento) {
 
-        // Validar Asignacion
-        if (mantenimiento.getAsignacion() != null) {
-            if (mantenimiento.getAsignacion().getId() == null) {
-                // Si el ID de Asignacion es nulo, no se puede relacionar el mantenimiento
-                // En este caso, puedes optar por:
-                // 1. Lanzar una excepción, indicando que se requiere un ID de Asignacion válido
-                // 2. Crear una nueva Asignacion (si tiene sentido en tu lógica de negocio)
-                // 3. Simplemente no establecer la asignación (dejar mantenimiento.setAsignacion(null))
-                // Aquí optaremos por lanzar una excepción para asegurar que se proporcione un ID de Asignacion existente
-                throw new IllegalArgumentException("Se requiere un ID de Asignacion válido para registrar el mantenimiento.");
+        // Validar Equipo
+        if (mantenimiento.getEquipo() != null) {
+            if (mantenimiento.getEquipo().getId() == null) {
+                throw new IllegalArgumentException("Se requiere un ID de Equipo válido para registrar el mantenimiento.");
             } else {
-                // Si el ID de Asignacion no es nulo, verificar que exista en la base de datos
-                Optional<Asignacion> asignacionOptional = asignacionRepository.findById(mantenimiento.getAsignacion().getId());
-                if (asignacionOptional.isEmpty()) {
-                    throw new EntityNotFoundException("No se encontró la Asignacion con el ID proporcionado.");
+                Optional<Equipo> equipoOptional = equipoRepository.findById(mantenimiento.getEquipo().getId());
+                if (equipoOptional.isEmpty()) {
+                    throw new EntityNotFoundException("No se encontró el Equipo con el ID proporcionado.");
                 }
-                mantenimiento.setAsignacion(asignacionOptional.get());
+                mantenimiento.setEquipo(equipoOptional.get());
             }
         } else {
-            // Si el objeto Asignacion es nulo, puedes optar por:
-            // 1. Lanzar una excepción, indicando que se requiere una Asignacion
-            // 2. Permitir mantenimientos sin Asignacion (si tiene sentido)
-            // Aquí optaremos por lanzar una excepción para asegurar que se proporcione una Asignacion
-            throw new IllegalArgumentException("Se requiere una Asignacion para registrar el mantenimiento.");
+            throw new IllegalArgumentException("Se requiere un Equipo para registrar el mantenimiento.");
         }
 
         return mantenimientoRepository.save(mantenimiento);
     }
+
 
 
     public boolean existeMantenimientoPorId(ObjectId id) {
@@ -78,28 +67,34 @@ public class MantenimientoService {
     }
 
 
-
-
-    public List<Mantenimiento> obtenerMantenimientosPorAsignacion(ObjectId asignacionId) {
-        return mantenimientoRepository.findByAsignacionId(asignacionId);
+    public List<Mantenimiento> obtenerMantenimientosPorEquipoId(ObjectId equipoId) {
+        // Opcional: Verificar si el equipo existe antes de buscar mantenimientos
+        if (!equipoRepository.existsById(equipoId)) {
+            throw new EntityNotFoundException("No se encontró el equipo con el ID proporcionado.");
+        }
+        return mantenimientoRepository.findByEquipoId(equipoId);
     }
 
-    public List<Mantenimiento> obtenerMantenimientosPorEquipo(ObjectId equipoId) {
-        List<Mantenimiento> mantenimientosResult = new ArrayList<>();
 
-        Optional<Equipo> equipoOptional = equipoRepository.findById(equipoId);
-        if (equipoOptional.isPresent()) {
-            List<Asignacion> asignaciones = asignacionRepository.findByEquipoId(equipoId);
+    /*buscar*/
+    public List<Mantenimiento> buscarMantenimientosPorNumeroSerie(String numeroSerie) {
+        List<Equipo> equipos = equipoRepository.findByNumeroSerieContainingIgnoreCase(numeroSerie);
 
-            if (!asignaciones.isEmpty()) {
-                for (Asignacion asignacion : asignaciones) {
-                    List<Mantenimiento> mantenimientosForAsignacion = mantenimientoRepository.findByAsignacionId(asignacion.getId());
-                    mantenimientosResult.addAll(mantenimientosForAsignacion);
-                }
-            }
+        if (equipos.isEmpty()) {
+            return new ArrayList<>();
         }
 
-        return mantenimientosResult;
+        // Puedes decidir si usas el primero o todos:
+        List<Mantenimiento> mantenimientos = new ArrayList<>();
+        for (Equipo equipo : equipos) {
+            List<Mantenimiento> mantenimientoDeEquipo = mantenimientoRepository.findByEquipo(equipo);
+            mantenimientos.addAll(mantenimientoDeEquipo);
+        }
+
+        return mantenimientos;
     }
+
+
+
 
 }

@@ -25,7 +25,7 @@ public class Asignacion {
     @DBRef(lazy = false)
     private Equipo equipo;
     @DBRef
-    private List<Personal> personal;
+    private Personal personal;
     private String ubicacionFisica;
     @DBRef
     private List<Licencia> licencias;

@@ -24,6 +24,9 @@ public class Mantenimiento {
     private Date fecha;
     private String actividadRealizada;
     private String evidencia;
+
     @DBRef(lazy = false)
-    private Asignacion asignacion;
+    private Personal personal;
+    @DBRef(lazy = false)
+    private Equipo equipo;
 }
