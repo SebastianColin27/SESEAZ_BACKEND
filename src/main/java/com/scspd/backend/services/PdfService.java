@@ -243,14 +243,15 @@ public class PdfService {
 
         // 4. Tabla con los datos de los mantenimientos (Ajustada - SIN Personal Asignado si no existe en Mantenimiento)
         // Columnas: Fecha, Actividad Realizada, Evidencia
-        PdfPTable table = new PdfPTable(3);
+        PdfPTable table = new PdfPTable(4);
         table.setWidthPercentage(100);
-        table.setWidths(new float[]{2, 6, 4}); // Ajusta según el contenido
+        table.setWidths(new float[]{3, 6, 5, 5}); // Ajusta según el contenido
 
         // Encabezados de la tabla
         table.addCell("Fecha");
         table.addCell("Actividad Realizada");
         table.addCell("Evidencia");
+        table.addCell("Asigando");
 
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); // Para formatear fechas
 
@@ -258,10 +259,14 @@ public class PdfService {
             String fecha = mantenimiento.getFecha() != null ? dateFormat.format(mantenimiento.getFecha()) : "N/A";
             String actividad = mantenimiento.getActividadRealizada() != null ? mantenimiento.getActividadRealizada() : "";
             String evidencia = mantenimiento.getEvidencia() != null ? mantenimiento.getEvidencia() : "";
+            String personal = mantenimiento.getPersonal() != null ? String.valueOf(mantenimiento.getPersonal().getNombre()) : "Sin asignar";
+
 
             table.addCell(fecha);
             table.addCell(actividad);
             table.addCell(evidencia);
+            table.addCell(personal);
+
         }
 
         document.add(table);

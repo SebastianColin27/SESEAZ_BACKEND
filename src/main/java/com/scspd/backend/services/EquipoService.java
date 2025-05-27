@@ -1,7 +1,9 @@
 package com.scspd.backend.services;
+import com.lowagie.text.Row;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import com.scspd.backend.models.Equipo;
 import com.scspd.backend.repositories.EquipoRepository;
+import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.bson.types.ObjectId;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -161,6 +164,6 @@ public class EquipoService {
         return equipoRepository.findByEstadoIgnoreCase(estado);
     }
 
-
+/*excel*/
 
 }

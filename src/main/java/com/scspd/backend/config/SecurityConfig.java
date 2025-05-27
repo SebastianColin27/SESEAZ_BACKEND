@@ -40,14 +40,9 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authRequest ->
                         authRequest
-
-
                                 .requestMatchers("/auth/**").permitAll()
                                 .requestMatchers("/api/**").authenticated()
-
-
                                 .anyRequest().denyAll()
-
                 )
                 .sessionManagement(sessionManager->
                         sessionManager
@@ -58,7 +53,7 @@ public class SecurityConfig {
 
     }
 
-    // *** AÑADE ESTE BEAN PARA CONFIGURAR CORS ***
+
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
@@ -85,7 +80,7 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:4200")
+                        .allowedOrigins("http://localhost:4200", "https://seseaz-frontend.vercel.app")
                         .allowedMethods("*")
                         .allowedHeaders("*")
                         .allowCredentials(true);

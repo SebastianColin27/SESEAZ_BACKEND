@@ -34,7 +34,7 @@ public class JwtService {
 
         return Jwts
                 .builder()
-                .setClaims(new HashMap<>(Map.of("roles", authorities))) // adds roles to token
+                .setClaims(new HashMap<>(Map.of("roles", authorities)))
                 .setSubject(user.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis()+1000*60*24))
