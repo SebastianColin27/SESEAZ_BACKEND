@@ -64,9 +64,7 @@ public class EquipoController {
                 return ResponseEntity.notFound().build();
             }
 
-      /*  equipo.setId(id);
-        Equipo equipoActualizado = equipoService.actualizarEquipo(equipo);
-        return ResponseEntity.ok(equipoActualizado);*/
+
             Optional<Equipo> existingEquipoOpt = equipoService.obtenerEquipoPorId(objectId);
             if (!existingEquipoOpt.isPresent()) {
                 return ResponseEntity.notFound().build(); // Should not happen based on existsById check, but safety
@@ -75,6 +73,7 @@ public class EquipoController {
 
             // Update fields from the request body
             existingEquipo.setNumeroSerie(equipo.getNumeroSerie());
+            existingEquipo.setNumeroInventario(equipo.getNumeroInventario());
             existingEquipo.setTipo(equipo.getTipo());
             existingEquipo.setMarca(equipo.getMarca());
             existingEquipo.setColor(equipo.getColor());
@@ -144,9 +143,8 @@ public class EquipoController {
 
     /*imagen*/
 
-
-    @PostMapping("/{id}/imagen")
     @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/{id}/imagen")
     public ResponseEntity<Equipo> uploadEquipoImagen(@PathVariable String id,
                                                      @RequestParam("imagen") MultipartFile file) {
         try {
@@ -175,8 +173,8 @@ public class EquipoController {
         }
     }
 
-    @GetMapping("/{id}/imagen")
     @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/{id}/imagen")
     public ResponseEntity<byte[]> getEquipoImagen(@PathVariable String id) {
         try {
             GridFSFile gridFSFile = equipoService.obtenerImagenGridFsFile(id);
