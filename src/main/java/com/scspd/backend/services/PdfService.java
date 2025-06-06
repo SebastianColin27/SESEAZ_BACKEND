@@ -44,7 +44,9 @@ public class PdfService {
     private MantenimientoService mantenimientoService;
     @Autowired
     private PersonalRepository personalRepository;
+
     Font fontContenido = new Font(Font.HELVETICA, 10);
+
     public void exportPdfAsignaciones(HttpServletResponse response) throws Exception {
         response.setContentType("application/pdf");
         response.setHeader("Content-Disposition", "attachment; filename=asignaciones_reporte_general.pdf");

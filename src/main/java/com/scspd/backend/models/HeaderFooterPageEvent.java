@@ -7,10 +7,13 @@ import com.lowagie.text.Image;
 import com.lowagie.text.pdf.PdfContentByte;
 import com.lowagie.text.pdf.PdfPageEventHelper;
 import com.lowagie.text.pdf.PdfWriter;
+import org.apache.commons.io.IOUtils;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+
 public class HeaderFooterPageEvent extends PdfPageEventHelper {
     private Image headerImage;
     private Image footerImage;
@@ -18,19 +21,31 @@ public class HeaderFooterPageEvent extends PdfPageEventHelper {
 
     public HeaderFooterPageEvent() {
         try {
-            // Ruta a la imagen del encabezado
-            String headerPath = new File("src/main/resources/static/seseaz_logo.jpg").getAbsolutePath();
-            headerImage = Image.getInstance(headerPath);
-            headerImage.scaleToFit(150, 150);
+            // Cargar imagen del encabezado desde el classpath
+            InputStream headerStream = getClass().getClassLoader().getResourceAsStream("static/images/seseaz_logo.jpg");
+            if (headerStream != null) {
+                byte[] headerBytes = IOUtils.toByteArray(headerStream);
+                headerImage = Image.getInstance(headerBytes);
+                headerImage.scaleToFit(150, 150);
+            } else {
+                System.err.println("No se encontró la imagen del encabezado");
+            }
 
-            // Ruta a la imagen del pie de página
-            String footerPath = new File("src/main/resources/static/seseazFooter.jpg").getAbsolutePath();
-            footerImage = Image.getInstance(footerPath);
-            footerImage.scaleToFit(450, 450);
+            // Cargar imagen del pie de página desde el classpath
+            InputStream footerStream = getClass().getClassLoader().getResourceAsStream("static/images/seseazFooter.jpg");
+            if (footerStream != null) {
+                byte[] footerBytes = IOUtils.toByteArray(footerStream);
+                footerImage = Image.getInstance(footerBytes);
+                footerImage.scaleToFit(450, 450);
+            } else {
+                System.err.println("No se encontró la imagen del pie de página");
+            }
+
         } catch (IOException | BadElementException e) {
             e.printStackTrace();
         }
     }
+
 
     @Override
     public void onEndPage(PdfWriter writer, Document document) {
