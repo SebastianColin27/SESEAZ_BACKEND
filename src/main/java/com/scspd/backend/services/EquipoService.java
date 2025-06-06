@@ -1,7 +1,9 @@
 package com.scspd.backend.services;
 import com.lowagie.text.Row;
 import com.mongodb.client.gridfs.model.GridFSFile;
+import com.scspd.backend.models.Asignacion;
 import com.scspd.backend.models.Equipo;
+import com.scspd.backend.repositories.AsignacionRepository;
 import com.scspd.backend.repositories.EquipoRepository;
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +20,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class EquipoService {
@@ -25,6 +29,8 @@ public class EquipoService {
     private EquipoRepository equipoRepository;
     @Autowired
     private GridFsTemplate gridFsTemplate;
+    @Autowired
+    private AsignacionRepository asignacionRepository;
 
 
     public List<Equipo> obtenerTodosLosEquipos() {
@@ -163,7 +169,5 @@ public class EquipoService {
     public List<Equipo> obtenerEquiposPorEstado(String estado) {
         return equipoRepository.findByEstadoIgnoreCase(estado);
     }
-
-/*excel*/
 
 }

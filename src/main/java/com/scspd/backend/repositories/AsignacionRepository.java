@@ -17,5 +17,4 @@ public interface AsignacionRepository extends MongoRepository<Asignacion, Object
     List<Asignacion> findByEquipo(Equipo equipo);
 
     List<Asignacion> findByEquipoNumeroSerieContainingIgnoreCase(String numeroSerie);
-
 }
