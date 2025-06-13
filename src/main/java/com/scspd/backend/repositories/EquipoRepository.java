@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.util.List;
 
 public interface EquipoRepository extends MongoRepository<Equipo, ObjectId>{
-    // Búsqueda exacta por número de serie (suponiendo que es único)
+    // Búsqueda exacta por número de serie
     List<Equipo> findByNumeroSerieContainingIgnoreCase(String numeroSerie);
 
     // Búsqueda parcial e insensible a mayúsculas/minúsculas por marca
@@ -16,7 +16,6 @@ public interface EquipoRepository extends MongoRepository<Equipo, ObjectId>{
     // Búsqueda parcial e insensible a mayúsculas/minúsculas por modelo
     List<Equipo> findByModeloContainingIgnoreCase(String modelo);
 
-
-
+    //Búsqueda por estado del equipo
     List<Equipo> findByEstadoIgnoreCase(String estado);
 }

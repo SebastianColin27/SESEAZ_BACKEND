@@ -24,7 +24,7 @@ public class AsignacionService {
     @Autowired
     private EquipoRepository equipoRepository;
     @Autowired
-    private PersonalRepository personalRepository;  //Inyecta el repositorio de personal
+    private PersonalRepository personalRepository;
     @Autowired
     private LicenciaRepository licenciaRepository;
 
@@ -55,12 +55,12 @@ public class AsignacionService {
             }
         }
 
-//  // Verificar y guardar personal (UN SOLO ELEMENTO)
+
 if (asignacion.getPersonal() != null) {
     Personal personal = asignacion.getPersonal();
 
     if (personal.getId() == null) {
-       // Si el ID es nulo, es una persona nueva que hay que persistir
+
         personal = personalRepository.save(personal);
     } else {
        // Si el ID no es nulo, verificar que exista en la base de datos
@@ -68,40 +68,35 @@ if (asignacion.getPersonal() != null) {
         if (personalOptional.isEmpty()) {
             throw new EntityNotFoundException("No se encontró personal con el ID proporcionado: " + personal.getId());
         }
-        personal = personalOptional.get(); // Usamos el objeto existente
+        personal = personalOptional.get();
    }
 
-    asignacion.setPersonal(personal); // Asignamos el objeto procesado
+    asignacion.setPersonal(personal);
 } else {
-    asignacion.setPersonal(null); // Si no hay personal, lo dejamos en null
+    asignacion.setPersonal(null);
 }
 
-        // Verificar y guardar licencias
         if (asignacion.getLicencias() != null && !asignacion.getLicencias().isEmpty()) {
             List<ObjectId> licenciasIds = asignacion.getLicencias().stream()
                     .filter(licencia -> licencia.getId() != null) //Filtra licencias con ID no nulo
                     .map(Licencia::getId)
                     .toList();
 
-            // Busca las licencias existentes solo si hay IDs válidos
             if (!licenciasIds.isEmpty()) {
                 List<Licencia> licenciasExistentes = licenciaRepository.findAllById(licenciasIds);
 
-                // Si no se encontraron todas las licencias, lanza la excepción
                 if (licenciasExistentes.size() != licenciasIds.size()) {
                     throw new EntityNotFoundException("No se encontraron todas las licencias con los IDs proporcionados");
                 }
 
-                // Establece las licencias existentes en la asignación
+
                 asignacion.setLicencias(licenciasExistentes);
             } else {
-                // Si todos los IDs de licencia son nulos, puedes lanzar una excepción o simplemente ignorar la lista de licencias
-                // En este caso, simplemente estableceremos la lista de licencias en null para evitar problemas
+
                 asignacion.setLicencias(null);
             }
         }
 
-        // ... (Lógica para manejar la fecha de fin de asignación) ...
 
         return asignacionRepository.save(asignacion);
     }
@@ -117,17 +112,8 @@ if (asignacion.getPersonal() != null) {
     }
 
 
-    public List<Asignacion> obtenerAsignacionesPorPersona(ObjectId personalId) {
-        return asignacionRepository.findByPersonalId(personalId);
-    }
-
-    public List<Asignacion> buscarPorNumeroSerie(String numeroSerie) {
-        return asignacionRepository.findByEquipoNumeroSerieContainingIgnoreCase(numeroSerie);
-    }
-
-
     public List<Asignacion> obtenerAsignacionesPorEquipoId(ObjectId equipoId) {
-        // Opcional: Verificar si el equipo existe antes de buscar asignaciones
+
         if (!equipoRepository.existsById(equipoId)) {
             throw new EntityNotFoundException("No se encontró el equipo con el ID proporcionado.");
         }
@@ -137,7 +123,7 @@ if (asignacion.getPersonal() != null) {
         return asignacionRepository.findByPersonalId(personalId);
     }
 
-  /*buscar*/
+
   public List<Asignacion> buscarAsignacionesPorNumeroSerie(String numeroSerie) {
       List<Equipo> equipos = equipoRepository.findByNumeroSerieContainingIgnoreCase(numeroSerie);
 
@@ -145,7 +131,7 @@ if (asignacion.getPersonal() != null) {
           return new ArrayList<>();
       }
 
-      // Puedes decidir si usas el primero o todos:
+
       List<Asignacion> asignaciones = new ArrayList<>();
       for (Equipo equipo : equipos) {
           List<Asignacion> asignacionesDeEquipo = asignacionRepository.findByEquipo(equipo);

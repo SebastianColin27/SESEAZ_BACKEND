@@ -77,7 +77,7 @@ public class EquipoService {
     public List<Equipo> buscarEquiposPorModelo(String modelo) {
         return equipoRepository.findByModeloContainingIgnoreCase(modelo);
     }
-/*--*/
+
     private ObjectId getObjectId(String id) {
         try {
             return new ObjectId(id);
@@ -96,28 +96,27 @@ public class EquipoService {
 
         Equipo equipo = equipoOptional.get();
 
-        // If an old image exists, delete it from GridFS
         if (equipo.getImagenGridFsId() != null) {
             try {
                 gridFsTemplate.delete(new Query(Criteria.where("_id").is(new ObjectId(equipo.getImagenGridFsId()))));
                 System.out.println("Deleted old image: " + equipo.getImagenGridFsId());
             } catch (Exception e) {
                 System.err.println("Error deleting old image " + equipo.getImagenGridFsId() + ": " + e.getMessage());
-                // Decide if you want to throw here or just log and continue
+
             }
         }
 
-        // Store the new file in GridFS
+
         ObjectId fileId = gridFsTemplate.store(
                 file.getInputStream(),
                 file.getOriginalFilename(),
-                file.getContentType() // Store content type
+                file.getContentType()
         );
 
-        // Update the Equipo document with the new GridFS file ID
+
         equipo.setImagenGridFsId(fileId.toHexString());
 
-        // Save the updated Equipo document
+
         return equipoRepository.save(equipo);
     }
 
@@ -126,7 +125,7 @@ public class EquipoService {
         Optional<Equipo> equipoOptional = equipoRepository.findById(objectId);
 
         if (!equipoOptional.isPresent() || equipoOptional.get().getImagenGridFsId() == null) {
-            return null; // Equipo not found or no image associated
+            return null;
         }
 
         String gridFsId = equipoOptional.get().getImagenGridFsId();
@@ -141,8 +140,6 @@ public class EquipoService {
     public InputStream obtenerImagenInputStream(String equipoId) {
         GridFSFile gridFSFile = obtenerImagenGridFsFile(equipoId);
         if (gridFSFile != null) {
-            // You can use GridFsTemplate.getResource or GridFSBucket
-            // Option 1: Using GridFsTemplate.getResource
             GridFsResource resource = gridFsTemplate.getResource(gridFSFile);
             try {
                 return resource.getInputStream();
@@ -150,8 +147,7 @@ public class EquipoService {
                 System.err.println("Error getting InputStream for GridFS file " + gridFSFile.getId() + ": " + e.getMessage());
                 return null;
             }
-            // Option 2: Using GridFSBucket (requires @Autowired GridFSBucket)
-            // return gridFsBucket.openDownloadStream(gridFSFile.getObjectId());
+
         }
         return null;
     }

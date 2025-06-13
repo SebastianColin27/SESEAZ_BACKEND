@@ -36,7 +36,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception
     {
         return http
-                .cors(Customizer.withDefaults()) //
+                .cors(Customizer.withDefaults())
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authRequest ->
                         authRequest
@@ -57,18 +57,16 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        // Orígenes permitidos (tu frontend Angular)
-        //configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "https://seseaz-frontend.vercel.app"));
+
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:4200", "https://seseaz-frontend.vercel.app","https://seseaz-controldeequipos.vercel.app"));
         // Métodos HTTP permitidos
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        // Cabeceras permitidas (importante incluir Authorization)
+        // Cabeceras permitidas (Authorization)
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "Access-Control-Allow-Origi"));
-        // Permitir credenciales (si usas cookies/sesiones, aunque con JWT stateless es menos común necesitarla true)
-        configuration.setAllowCredentials(true); // Mantenla si angular-jwt la necesita o si tienes algún caso de uso
+        // Permitir credenciales
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        // Aplica esta configuración a todas las rutas bajo /
         source.registerCorsConfiguration("/**", configuration);
         return source;
     }
@@ -80,7 +78,7 @@ public class SecurityConfig {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("http://localhost:4200", "https://seseaz-frontend.vercel.app")
+                        .allowedOrigins("http://localhost:4200", "https://seseaz-frontend.vercel.app","https://seseaz-controldeequipos.vercel.app")
                         .allowedMethods("*")
                         .allowedHeaders("*")
                         .allowCredentials(true);

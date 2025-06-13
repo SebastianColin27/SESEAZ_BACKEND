@@ -63,12 +63,12 @@ public class PdfService {
         document.add(new Paragraph("REPORTE DE ASIGNACIONES GENERAL "));
         document.add(Chunk.NEWLINE); // Espacio
 
-        // Tabla con 6 columnas
+
         PdfPTable table = new PdfPTable(6);
         table.setWidthPercentage(100);
-        table.setWidths(new float[]{3, 3, 3, 4, 4, 5}); // Ajusta según el contenido
+        table.setWidths(new float[]{3, 3, 3, 4, 4, 5});
 
-        // Encabezados
+
         table.addCell("No. Serie");
         table.addCell("Fecha Asignación");
         table.addCell("Fecha Fin Asignación");
@@ -76,7 +76,7 @@ public class PdfService {
         table.addCell("Personal Asignado");
         table.addCell("Comentarios");
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); // Para formatear fechas
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         for (Asignacion asignacion : asignaciones) {
             String numeroSerie = asignacion.getEquipo() != null ? asignacion.getEquipo().getNumeroSerie() : "N/A";
@@ -86,7 +86,7 @@ public class PdfService {
             String fechaFinAsignacion = asignacion.getFechaFinAsignacion() != null ? dateFormat.format(asignacion.getFechaFinAsignacion()) : "Actual"; // Mostrar "Actual" si no ha finalizado
             String nombreEquipo = asignacion.getNombreEquipo() != null ? asignacion.getNombreEquipo() : "N/A";
 
-            // Ahora personal es un solo objeto, no una lista
+
             String nombrePersonal = asignacion.getPersonal() != null
                     ? asignacion.getPersonal().getNombre()
                     : "N/A";
@@ -122,12 +122,11 @@ public class PdfService {
         document.add(new Paragraph("REPORTE DE MANTENIMIENTOS GENERAL"));
         document.add(new Paragraph(" ")); // Espacio
 
-        // Corregido: Tabla de 5 columnas
+
         PdfPTable table = new PdfPTable(5);
         table.setWidthPercentage(100);
         table.setWidths(new float[]{3, 6, 5, 5, 5});
 
-        // Encabezados
         table.addCell("Fecha");
         table.addCell("Actividad Realizada");
         table.addCell("Evidencia");
@@ -148,7 +147,6 @@ public class PdfService {
                     ? equipo.getNumeroSerie() : "N/A";
 
 
-            // Celdas alineadas correctamente con los encabezados
             table.addCell(new PdfPCell(new Phrase(fecha, fontContenido)));
             table.addCell(new PdfPCell(new Phrase(actividad, fontContenido)));
             table.addCell(new PdfPCell(new Phrase(evidencia, fontContenido)));
@@ -292,34 +290,30 @@ public class PdfService {
 
     // Generar reporte PDF de Asignaciones por Personal
     public void exportPdfAsignacionesPorPersonal(HttpServletResponse response, ObjectId personalId) throws Exception {
-        // 1. Obtener la información del personal para el título del reporte
+
         Optional<Personal> personalOptional = personalRepository.findById(personalId);
         if (personalOptional.isEmpty()) {
             throw new EntityNotFoundException("No se encontró el personal con el ID proporcionado.");
         }
         Personal personal = personalOptional.get();
 
-        // 2. Obtener las asignaciones para este personal
         List<Asignacion> asignaciones = asignacionService.obtenerAsignacionesPorPersonalId(personalId);
 
-        // 3. Crear el documento PDF
         Document document = new Document(PageSize.A4, 36, 36, 54, 72);
         PdfWriter writer = PdfWriter.getInstance(document, response.getOutputStream());
         writer.setPageEvent(new HeaderFooterPageEvent());
         document.open();
 
-        // Título del reporte
         document.add(new Paragraph("\n\n\n"));
         document.add(new Paragraph("REPORTE DE HISTORIAL DE ASIGNACIONES DEL PERSONAL: " + personal.getNombre() + " (" + personal.getCargo() + ")"));
         document.add(new Paragraph(" ")); // Espacio
 
-        // 4. Tabla con los datos de las asignaciones
-        // Columnas: Fecha Asignación, Fecha Fin Asignación, Equipo Asignado, Licencias Asignadas, Comentarios
+
         PdfPTable table = new PdfPTable(5);
         table.setWidthPercentage(100);
         table.setWidths(new float[]{3, 3, 5, 5, 5}); // Ajusta según el contenido
 
-        // Encabezados de la tabla
+
         table.addCell("Fecha Asignación");
         table.addCell("Fecha Fin Asignación");
         table.addCell("Equipo Asignado");

@@ -23,7 +23,6 @@ com\scspd\backend\repositories\PersonalRepository.class
 com\scspd\backend\repositories\AsignacionRepository.class
 com\scspd\backend\auth\AuthResponse$AuthResponseBuilder.class
 com\scspd\backend\models\Asignacion.class
-com\scspd\backend\controller\DemoController.class
 com\scspd\backend\repositories\MantenimientoRepository.class
 com\scspd\backend\controllers\MantenimientoController.class
 com\scspd\backend\auth\AuthResponse.class

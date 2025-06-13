@@ -16,8 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-//@CrossOrigin(origins = "http://localhost:4200")
-@CrossOrigin(origins = {"http://localhost:4200", "https://seseaz-frontend.vercel.app"})
+@CrossOrigin(origins = {"http://localhost:4200", "https://seseaz-frontend.vercel.app","https://seseaz-controldeequipos.vercel.app"})
 @RequestMapping("/api/mantenimientos")
 public class MantenimientoController {
     @Autowired
@@ -48,7 +47,7 @@ public class MantenimientoController {
             return new ResponseEntity<>(nuevoMantenimiento, HttpStatus.CREATED);
         } catch (Exception e) {
             // Maneja la excepción de forma adecuada (log, mensaje de error, etc.)
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // o un mensaje de error
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 

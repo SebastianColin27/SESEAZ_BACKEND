@@ -14,7 +14,7 @@ import java.util.List; // <---- IMPORT LIST!
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-@Document("personal") // Nombre de la colección en MongoDB
+@Document("personal")
 public class Personal {
     @Id
     @JsonSerialize(using = ToStringSerializer.class)

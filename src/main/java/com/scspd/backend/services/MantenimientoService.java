@@ -38,7 +38,7 @@ public class MantenimientoService {
     }
     public Mantenimiento guardarMantenimiento(Mantenimiento mantenimiento) {
 
-        // Validar Equipo
+
         if (mantenimiento.getEquipo() != null) {
             if (mantenimiento.getEquipo().getId() == null) {
                 throw new IllegalArgumentException("Se requiere un ID de Equipo válido para registrar el mantenimiento.");
@@ -68,7 +68,7 @@ public class MantenimientoService {
 
 
     public List<Mantenimiento> obtenerMantenimientosPorEquipoId(ObjectId equipoId) {
-        // Opcional: Verificar si el equipo existe antes de buscar mantenimientos
+
         if (!equipoRepository.existsById(equipoId)) {
             throw new EntityNotFoundException("No se encontró el equipo con el ID proporcionado.");
         }
@@ -76,7 +76,7 @@ public class MantenimientoService {
     }
 
 
-    /*buscar*/
+
     public List<Mantenimiento> buscarMantenimientosPorNumeroSerie(String numeroSerie) {
         List<Equipo> equipos = equipoRepository.findByNumeroSerieContainingIgnoreCase(numeroSerie);
 
@@ -84,7 +84,7 @@ public class MantenimientoService {
             return new ArrayList<>();
         }
 
-        // Puedes decidir si usas el primero o todos:
+
         List<Mantenimiento> mantenimientos = new ArrayList<>();
         for (Equipo equipo : equipos) {
             List<Mantenimiento> mantenimientoDeEquipo = mantenimientoRepository.findByEquipo(equipo);

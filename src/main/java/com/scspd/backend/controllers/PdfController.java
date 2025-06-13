@@ -11,8 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-//@CrossOrigin(origins = "http://localhost:4200")
-@CrossOrigin(origins = {"http://localhost:4200", "https://seseaz-frontend.vercel.app"})
+@CrossOrigin(origins = {"http://localhost:4200", "https://seseaz-frontend.vercel.app","https://seseaz-controldeequipos.vercel.app"})
 @RequestMapping("/api/pdf")
 
 public class PdfController {
@@ -48,13 +47,13 @@ public class PdfController {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'LECTOR', 'MODERADOR')")
-    @GetMapping("/asignaciones/equipo/{equipoId}") // Nuevo endpoint para reporte de asignaciones por equipo
+    @GetMapping("/asignaciones/equipo/{equipoId}")
     public void generarPdfAsignacionesPorEquipo(HttpServletResponse response, @PathVariable ObjectId equipoId) {
         response.setContentType("application/pdf");
         response.setHeader("Content-Disposition", "attachment; filename=reporte_asignaciones_equipo_" + equipoId.toHexString() + ".pdf");
 
         try {
-            pdfService.exportPdfAsignacionesPorEquipo(response, equipoId); // Llama al nuevo método del servicio
+            pdfService.exportPdfAsignacionesPorEquipo(response, equipoId);
         } catch (Exception e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -68,7 +67,7 @@ public class PdfController {
         response.setHeader("Content-Disposition", "attachment; filename=reporte_mantenimientos_equipo_" + equipoId.toHexString() + ".pdf");
 
         try {
-            pdfService.exportPdfMantenimientosPorEquipo(response, equipoId); // Llama al nuevo método del servicio
+            pdfService.exportPdfMantenimientosPorEquipo(response, equipoId);
         } catch (Exception e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -76,13 +75,13 @@ public class PdfController {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'LECTOR', 'MODERADOR')")
-    @GetMapping("/asignaciones/personal/{personalId}") // Nuevo endpoint para reporte de asignaciones por personal
+    @GetMapping("/asignaciones/personal/{personalId}")
     public void generarPdfAsignacionesPorPersonal(HttpServletResponse response, @PathVariable ObjectId personalId) {
         response.setContentType("application/pdf");
         response.setHeader("Content-Disposition", "attachment; filename=reporte_asignaciones_personal_" + personalId.toHexString() + ".pdf");
 
         try {
-            pdfService.exportPdfAsignacionesPorPersonal(response, personalId); // Llama al nuevo método del servicio
+            pdfService.exportPdfAsignacionesPorPersonal(response, personalId);
         } catch (Exception e) {
             e.printStackTrace();
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

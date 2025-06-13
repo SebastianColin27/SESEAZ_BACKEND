@@ -23,8 +23,7 @@ import java.util.Optional;
 
 @Slf4j
 @RestController
-//@CrossOrigin(origins = "http://localhost:4200")
-@CrossOrigin(origins = {"http://localhost:4200", "https://seseaz-frontend.vercel.app"})
+@CrossOrigin(origins = {"http://localhost:4200", "https://seseaz-frontend.vercel.app","https://seseaz-controldeequipos.vercel.app"})
 @RequestMapping("/api/equipos")
 public class EquipoController {
     @Autowired
@@ -67,11 +66,11 @@ public class EquipoController {
 
             Optional<Equipo> existingEquipoOpt = equipoService.obtenerEquipoPorId(objectId);
             if (!existingEquipoOpt.isPresent()) {
-                return ResponseEntity.notFound().build(); // Should not happen based on existsById check, but safety
+                return ResponseEntity.notFound().build();
             }
             Equipo existingEquipo = existingEquipoOpt.get();
 
-            // Update fields from the request body
+
             existingEquipo.setNumeroSerie(equipo.getNumeroSerie());
             existingEquipo.setNumeroInventario(equipo.getNumeroInventario());
             existingEquipo.setTipo(equipo.getTipo());
@@ -82,12 +81,12 @@ public class EquipoController {
             existingEquipo.setRam(equipo.getRam());
             existingEquipo.setHDD(equipo.getHDD());
             existingEquipo.setSDD(equipo.getSDD());
-            existingEquipo.setPuertos(equipo.getPuertos()); // Make sure Puertos is correctly handled
+            existingEquipo.setPuertos(equipo.getPuertos());
             existingEquipo.setEstado(equipo.getEstado());
             existingEquipo.setFechaCompra(equipo.getFechaCompra());
-            // existingEquipo.setImagenGridFsId() is NOT updated here from the request body
 
-            Equipo equipoActualizado = equipoService.actualizarEquipo(existingEquipo); // Save the updated existing entity
+
+            Equipo equipoActualizado = equipoService.actualizarEquipo(existingEquipo);
             return ResponseEntity.ok(equipoActualizado);
 
         } catch (IllegalArgumentException e) {
@@ -148,12 +147,11 @@ public class EquipoController {
     public ResponseEntity<Equipo> uploadEquipoImagen(@PathVariable String id,
                                                      @RequestParam("imagen") MultipartFile file) {
         try {
-            // Validation: Check if file is present and not empty
             if (file.isEmpty()) {
-                return ResponseEntity.badRequest().body(null); // Or a custom error response
+                return ResponseEntity.badRequest().body(null);
             }
 
-            // Validate file type if necessary (e.g., only images)
+
             if (!file.getContentType().startsWith("image/")) {
                 return ResponseEntity.status(HttpStatus.UNSUPPORTED_MEDIA_TYPE).body(null);
             }
@@ -163,13 +161,13 @@ public class EquipoController {
             return ResponseEntity.ok(equipoActualizado);
         } catch (IllegalArgumentException e) {
             log.error("Error uploading image: Invalid Equipo ID or Equipo not found.", e);
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // 404 if equipo not found
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null); // 404
         } catch (IOException e) {
             log.error("Error reading image file.", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // 500 on IO error
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // 500
         } catch (Exception e) {
             log.error("An unexpected error occurred during image upload.", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null); // Catch other potential errors
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
         }
     }
 
@@ -185,7 +183,7 @@ public class EquipoController {
 
             InputStream inputStream = equipoService.obtenerImagenInputStream(id);
             String contentType = equipoService.obtenerImagenContentType(id);
-            byte[] imageBytes = IOUtils.toByteArray(inputStream); // usa commons-io
+            byte[] imageBytes = IOUtils.toByteArray(inputStream);
 
             return ResponseEntity.ok()
                     .contentType(MediaType.parseMediaType(contentType != null ? contentType : "image/jpeg"))

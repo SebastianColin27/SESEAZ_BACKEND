@@ -12,8 +12,6 @@ public interface MantenimientoRepository extends MongoRepository<Mantenimiento, 
 
     List<Mantenimiento> findByEquipoId(ObjectId equipoId);
 
-
-    List<Mantenimiento> findByEquipoNumeroSerieContainingIgnoreCase(String numeroSerie);
     List<Mantenimiento> findByEquipo(Equipo equipo);
 
 }

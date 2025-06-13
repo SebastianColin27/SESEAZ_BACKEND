@@ -21,7 +21,7 @@ public class HeaderFooterPageEvent extends PdfPageEventHelper {
 
     public HeaderFooterPageEvent() {
         try {
-            // Cargar imagen del encabezado desde el classpath
+
             InputStream headerStream = getClass().getClassLoader().getResourceAsStream("static/images/seseaz_logo.jpg");
             if (headerStream != null) {
                 byte[] headerBytes = IOUtils.toByteArray(headerStream);
@@ -31,7 +31,7 @@ public class HeaderFooterPageEvent extends PdfPageEventHelper {
                 System.err.println("No se encontró la imagen del encabezado");
             }
 
-            // Cargar imagen del pie de página desde el classpath
+
             InputStream footerStream = getClass().getClassLoader().getResourceAsStream("static/images/seseazFooter.jpg");
             if (footerStream != null) {
                 byte[] footerBytes = IOUtils.toByteArray(footerStream);
@@ -53,15 +53,15 @@ public class HeaderFooterPageEvent extends PdfPageEventHelper {
         float y = document.top() + 10;
 
         try {
-            // Encabezado
+
             if (headerImage != null) {
-                float headerX = document.left(); // puedes ajustar si quieres centrar
-                float headerY = document.top()  - 30; // ligeramente encima del margen superior
+                float headerX = document.left();
+                float headerY = document.top()  - 30;
                 headerImage.setAbsolutePosition(headerX, headerY);
                 canvas.addImage(headerImage);
 
                 // Línea justo debajo del logo
-                float lineY = y - headerImage.getScaledHeight() + 20; // 5 puntos de espacio debajo del logo
+                float lineY = y - headerImage.getScaledHeight() + 20;
                 canvas.setLineWidth(1f); // Grosor de la línea
                 canvas.setColorStroke(Color.GRAY); // Color de la línea
                 canvas.moveTo(document.left(), lineY);
@@ -70,10 +70,10 @@ public class HeaderFooterPageEvent extends PdfPageEventHelper {
 
             }
 
-            // Pie de página
+
             if (footerImage != null) {
                 float footerX = (document.left() + document.right() - footerImage.getScaledWidth()) / 2;
-                float footerY = document.bottom() - footerImage.getScaledHeight(); // justo debajo del margen inferior
+                float footerY = document.bottom() - footerImage.getScaledHeight();
                 footerImage.setAbsolutePosition(footerX, footerY);
                 canvas.addImage(footerImage);
             }
