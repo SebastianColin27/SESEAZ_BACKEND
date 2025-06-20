@@ -23,10 +23,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.*;
 import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -136,25 +134,32 @@ public class PdfService {
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); // Para formatear fechas
 
-        for (Mantenimiento mantenimiento : mantenimientos) {
-            String fecha = mantenimiento.getFecha() != null ? dateFormat.format(mantenimiento.getFecha()) : "N/A";
-            String actividad = mantenimiento.getActividadRealizada() != null ? mantenimiento.getActividadRealizada() : "";
-            String evidencia = mantenimiento.getEvidencia() != null ? mantenimiento.getEvidencia() : "";
-            String personal = mantenimiento.getPersonal() != null ? String.valueOf(mantenimiento.getPersonal().getNombre()) : "Sin asignar";
+            for (Mantenimiento mantenimiento : mantenimientos) {
+                String fecha = mantenimiento.getFecha() != null ? dateFormat.format(mantenimiento.getFecha()) : "N/A";
+                String actividad = mantenimiento.getActividadRealizada() != null ? mantenimiento.getActividadRealizada() : "";
+                String evidencia = mantenimiento.getEvidencia() != null ? mantenimiento.getEvidencia() : "";
 
-            Equipo equipo = mantenimiento.getEquipo();
-            String nombreEquipo = (equipo != null && equipo.getNumeroSerie() != null)
-                    ? equipo.getNumeroSerie() : "N/A";
+                Equipo equipo = mantenimiento.getEquipo();
+                String nombreEquipo = (equipo != null && equipo.getNumeroSerie() != null)
+                        ? equipo.getNumeroSerie() : "N/A";
+
+                String personal = "Sin asignar";
+                if (mantenimiento.getEquipo() != null && mantenimiento.getFecha() != null) {
+                    personal = obtenerNombreAsignado(mantenimiento.getEquipo().getId(), mantenimiento.getFecha());
+                }
 
 
-            table.addCell(new PdfPCell(new Phrase(fecha, fontContenido)));
-            table.addCell(new PdfPCell(new Phrase(actividad, fontContenido)));
-            table.addCell(new PdfPCell(new Phrase(evidencia, fontContenido)));
-            table.addCell(new PdfPCell(new Phrase(nombreEquipo, fontContenido)));
-            table.addCell(new PdfPCell(new Phrase(personal, fontContenido)));
-        }
 
-        document.add(table);
+
+                table.addCell(new PdfPCell(new Phrase(fecha, fontContenido)));
+                table.addCell(new PdfPCell(new Phrase(actividad, fontContenido)));
+                table.addCell(new PdfPCell(new Phrase(evidencia, fontContenido)));
+                table.addCell(new PdfPCell(new Phrase(nombreEquipo, fontContenido)));
+                table.addCell(new PdfPCell(new Phrase(personal, fontContenido)));
+            }
+
+
+            document.add(table);
         document.close();
     }
 
@@ -274,15 +279,21 @@ public class PdfService {
             String fecha = mantenimiento.getFecha() != null ? dateFormat.format(mantenimiento.getFecha()) : "N/A";
             String actividad = mantenimiento.getActividadRealizada() != null ? mantenimiento.getActividadRealizada() : "";
             String evidencia = mantenimiento.getEvidencia() != null ? mantenimiento.getEvidencia() : "";
-            String personal = mantenimiento.getPersonal() != null ? String.valueOf(mantenimiento.getPersonal().getNombre()) : "Sin asignar";
+
+
+            String personal = "Sin asignar";
+            if (mantenimiento.getEquipo() != null && mantenimiento.getFecha() != null) {
+                personal = obtenerNombreAsignado(mantenimiento.getEquipo().getId(), mantenimiento.getFecha());
+            }
+
 
 
             table.addCell(new PdfPCell(new Phrase(fecha, fontContenido)));
             table.addCell(new PdfPCell(new Phrase(actividad, fontContenido)));
             table.addCell(new PdfPCell(new Phrase(evidencia, fontContenido)));
             table.addCell(new PdfPCell(new Phrase(personal, fontContenido)));
-
         }
+
 
         document.add(table);
         document.close();
@@ -349,6 +360,27 @@ public class PdfService {
 
         document.add(table);
         document.close();
+    }
+
+//función auxiliar para encontrar el nombre del responsable en esa fecha del mantenimiento
+
+    private String obtenerNombreAsignado(ObjectId equipoId, Date fechaMantenimiento) {
+        List<Asignacion> asignaciones = asignacionRepository.findByEquipoId(equipoId);
+        if (asignaciones == null || asignaciones.isEmpty()) {
+            return "Sin asignar";
+        }
+
+        return asignaciones.stream()
+                .filter(a -> {
+                    Date inicio = a.getFechaAsignacion();
+                    Date fin = a.getFechaFinAsignacion();
+                    return inicio != null &&
+                            !fechaMantenimiento.before(inicio) && // fechaMantenimiento >= inicio
+                            (fin == null || fechaMantenimiento.before(fin)); // fechaMantenimiento < fin (si existe)
+                })
+                .max(Comparator.comparing(Asignacion::getFechaAsignacion)) // la más reciente válida
+                .map(a -> a.getPersonal() != null ? a.getPersonal().getNombre() : "Sin asignar")
+                .orElse("Sin asignar");
     }
 
 
