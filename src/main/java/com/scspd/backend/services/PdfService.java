@@ -2,7 +2,6 @@ package com.scspd.backend.services;
 
 import com.lowagie.text.*;
 import com.lowagie.text.Font;
-import com.lowagie.text.Image;
 import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
@@ -18,10 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityNotFoundException;
-import java.awt.*;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
@@ -59,7 +54,7 @@ public class PdfService {
 
         document.add(new Paragraph("\n\n\n"));
         document.add(new Paragraph("REPORTE DE ASIGNACIONES GENERAL "));
-        document.add(Chunk.NEWLINE); // Espacio
+        document.add(Chunk.NEWLINE);
 
 
         PdfPTable table = new PdfPTable(6);
@@ -118,7 +113,7 @@ public class PdfService {
 
         document.add(new Paragraph("\n\n\n"));
         document.add(new Paragraph("REPORTE DE MANTENIMIENTOS GENERAL"));
-        document.add(new Paragraph(" ")); // Espacio
+        document.add(new Paragraph(" "));
 
 
         PdfPTable table = new PdfPTable(5);
@@ -132,7 +127,7 @@ public class PdfService {
         table.addCell("Personal Asignado");
 
 
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); // Para formatear fechas
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
             for (Mantenimiento mantenimiento : mantenimientos) {
                 String fecha = mantenimiento.getFecha() != null ? dateFormat.format(mantenimiento.getFecha()) : "N/A";
@@ -147,9 +142,6 @@ public class PdfService {
                 if (mantenimiento.getEquipo() != null && mantenimiento.getFecha() != null) {
                     personal = obtenerNombreAsignado(mantenimiento.getEquipo().getId(), mantenimiento.getFecha());
                 }
-
-
-
 
                 table.addCell(new PdfPCell(new Phrase(fecha, fontContenido)));
                 table.addCell(new PdfPCell(new Phrase(actividad, fontContenido)));
@@ -240,40 +232,39 @@ public class PdfService {
 
     //  Generar reporte PDF de Mantenimientos por Equipo
     public void exportPdfMantenimientosPorEquipo(HttpServletResponse response, ObjectId equipoId) throws Exception {
-        // 1. Obtener la información del equipo para el título del reporte
+
         Optional<Equipo> equipoOptional = equipoRepository.findById(equipoId);
         if (equipoOptional.isEmpty()) {
             throw new EntityNotFoundException("No se encontró el equipo con el ID proporcionado.");
         }
         Equipo equipo = equipoOptional.get();
 
-        // 2. Obtener los mantenimientos para este equipo
+
         List<Mantenimiento> mantenimientos = mantenimientoService.obtenerMantenimientosPorEquipoId(equipoId);
 
-        // 3. Crear el documento PDF
+
         Document document = new Document(PageSize.A4, 36, 36, 54, 72);
         PdfWriter writer = PdfWriter.getInstance(document, response.getOutputStream());
         writer.setPageEvent(new HeaderFooterPageEvent());
         document.open();
 
-        // Título del reporte
+
         document.add(new Paragraph("\n\n\n"));
         document.add(new Paragraph("REPORTE DE HISTORIAL DE MANTENIMIENTOS PARA EL EQUIPO: " + equipo.getNumeroSerie() + " (" + equipo.getModelo() + "-" + equipo.getColor() + ")"));
-        document.add(new Paragraph(" ")); // Espacio
+        document.add(new Paragraph(" "));
 
-        // 4. Tabla con los datos de los mantenimientos (Ajustada - SIN Personal Asignado si no existe en Mantenimiento)
-        // Columnas: Fecha, Actividad Realizada, Evidencia
+
         PdfPTable table = new PdfPTable(4);
         table.setWidthPercentage(100);
-        table.setWidths(new float[]{3, 6, 5, 5}); // Ajusta según el contenido
+        table.setWidths(new float[]{3, 6, 5, 5});
 
-        // Encabezados de la tabla
+
         table.addCell("Fecha");
         table.addCell("Actividad Realizada");
         table.addCell("Evidencia");
         table.addCell("Asigando");
 
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd"); // Para formatear fechas
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
         for (Mantenimiento mantenimiento : mantenimientos) {
             String fecha = mantenimiento.getFecha() != null ? dateFormat.format(mantenimiento.getFecha()) : "N/A";

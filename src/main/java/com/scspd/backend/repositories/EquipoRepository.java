@@ -16,6 +16,4 @@ public interface EquipoRepository extends MongoRepository<Equipo, ObjectId>{
     // Búsqueda parcial e insensible a mayúsculas/minúsculas por modelo
     List<Equipo> findByModeloContainingIgnoreCase(String modelo);
 
-    //Búsqueda por estado del equipo
-    List<Equipo> findByEstadoIgnoreCase(String estado);
 }

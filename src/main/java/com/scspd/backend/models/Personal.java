@@ -7,7 +7,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import java.util.Date;
 import org.bson.types.ObjectId;
-import java.util.List; // <---- IMPORT LIST!
 
 @Getter
 @Setter

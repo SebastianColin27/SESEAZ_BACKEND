@@ -1,4 +1,5 @@
 package com.scspd.backend.services;
+
 import com.scspd.backend.models.Licencia;
 import com.scspd.backend.repositories.LicenciaRepository;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -16,15 +16,12 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:4200", "http://192.168.100.32","https://seseaz-controldeequipos.vercel.app"})
+@CrossOrigin(origins = {"http://localhost:4200", "https://seseaz-controldeequipos.vercel.app"})
 @RequestMapping("/api/mantenimientos")
 public class MantenimientoController {
     @Autowired
     private MantenimientoService mantenimientoService;
-    @Autowired
-    private EquipoRepository equipoRepository;
-    @Autowired
-    private MantenimientoRepository mantenimientoRepository;
+
 
     @PreAuthorize("hasAnyRole('ADMIN', 'LECTOR', 'MODERADOR')")
     @GetMapping

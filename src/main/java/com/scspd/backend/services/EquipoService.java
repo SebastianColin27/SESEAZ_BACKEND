@@ -1,11 +1,10 @@
 package com.scspd.backend.services;
-import com.lowagie.text.Row;
+
+
 import com.mongodb.client.gridfs.model.GridFSFile;
-import com.scspd.backend.models.Asignacion;
 import com.scspd.backend.models.Equipo;
 import com.scspd.backend.repositories.AsignacionRepository;
 import com.scspd.backend.repositories.EquipoRepository;
-import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
@@ -15,13 +14,11 @@ import org.springframework.stereotype.Service;
 import org.bson.types.ObjectId;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
+
 
 @Service
 public class EquipoService {
@@ -155,15 +152,6 @@ public class EquipoService {
     public String obtenerImagenContentType(String equipoId) {
         GridFSFile gridFSFile = obtenerImagenGridFsFile(equipoId);
         return gridFSFile != null ? gridFSFile.getMetadata().getString("_contentType") : null;
-    }
-
-    public GridFsResource getImagenResourceByGridFsId(String gridFsId) {
-        GridFSFile file = gridFsTemplate.findOne(new Query(Criteria.where("_id").is(new ObjectId(gridFsId))));
-        return file != null ? gridFsTemplate.getResource(file) : null;
-    }
-
-    public List<Equipo> obtenerEquiposPorEstado(String estado) {
-        return equipoRepository.findByEstadoIgnoreCase(estado);
     }
 
 }

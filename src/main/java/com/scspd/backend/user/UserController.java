@@ -19,9 +19,9 @@ public class UserController {
     @GetMapping(value = "{id}")
     public ResponseEntity<UserDTO> getUser(@PathVariable String id) {
 
-        // Obtener el usuario actual
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        //Asginamos a una variable el rol, en caso de que no lo tenga será nulo
+
         String userRole = authentication.getAuthorities().stream()
                 .findFirst()
                 .map(GrantedAuthority::getAuthority)

@@ -1,4 +1,5 @@
 package com.scspd.backend.controllers;
+
 import com.scspd.backend.models.Licencia;
 import com.scspd.backend.services.LicenciaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,13 +9,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.bson.types.ObjectId;
 
-import jakarta.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:4200", "http://192.168.100.32","https://seseaz-controldeequipos.vercel.app"})
+@CrossOrigin(origins = {"http://localhost:4200","https://seseaz-controldeequipos.vercel.app"})
 @RequestMapping("/api/licencias")
 public class LicenciaController {
     @Autowired

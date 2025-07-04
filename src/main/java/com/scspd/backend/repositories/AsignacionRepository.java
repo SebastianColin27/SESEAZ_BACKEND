@@ -7,8 +7,6 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 
 import java.util.List;
 public interface AsignacionRepository extends MongoRepository<Asignacion, ObjectId>  {
-    //Obtener el historial de personal y equipo
-
 
     List<Asignacion> findByEquipoId(ObjectId equipoId);
 
@@ -16,5 +14,5 @@ public interface AsignacionRepository extends MongoRepository<Asignacion, Object
 
     List<Asignacion> findByEquipo(Equipo equipo);
 
-    List<Asignacion> findByEquipoNumeroSerieContainingIgnoreCase(String numeroSerie);
+
 }

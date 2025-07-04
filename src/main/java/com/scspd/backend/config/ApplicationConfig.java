@@ -50,7 +50,7 @@ public class ApplicationConfig {
     }
     @PostConstruct
     public void init(){
-        TimeZone.setDefault(TimeZone.getTimeZone("America/Mexico_City")); // Usa tu zona horaria
+        TimeZone.setDefault(TimeZone.getTimeZone("America/Mexico_City"));
     }
 
 

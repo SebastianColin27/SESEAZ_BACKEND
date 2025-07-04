@@ -23,11 +23,7 @@ public class MantenimientoService {
     @Autowired
     private EquipoRepository equipoRepository;
 
-    @Autowired
-    private AsignacionRepository asignacionRepository;
 
-    @Autowired
-    private PersonalRepository personalRepository;
 
     public List<Mantenimiento> obtenerTodosLosMantenimientos() {
         return mantenimientoRepository.findAll();

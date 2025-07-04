@@ -1,4 +1,5 @@
 package com.scspd.backend.controllers;
+
 import com.scspd.backend.models.Asignacion;
 import com.scspd.backend.services.AsignacionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:4200", "http://192.168.100.32","https://seseaz-controldeequipos.vercel.app"})
+@CrossOrigin(origins = {"http://localhost:4200", "https://seseaz-controldeequipos.vercel.app"})
 @RequestMapping("/api/asignaciones")
 public class AsignacionController {
     @Autowired
@@ -45,7 +46,6 @@ public class AsignacionController {
     public ResponseEntity<Asignacion> actualizarAsignacion(
             @PathVariable ObjectId id,
             @Valid @RequestBody Asignacion asignacion) {
-//Se crea una nueva asignacion si la anterior ya está cerrada
         if(!asignacionService.existeAsignacionConId(id) ){
             return ResponseEntity.notFound().build();
 

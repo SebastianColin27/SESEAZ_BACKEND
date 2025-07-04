@@ -1,7 +1,6 @@
 package com.scspd.backend.auth;
 
 import com.scspd.backend.jwt.JwtService;
-import com.scspd.backend.user.Role;
 import com.scspd.backend.user.User;
 import com.scspd.backend.user.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -9,7 +8,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.security.core.GrantedAuthority;
+
 
 
 import lombok.RequiredArgsConstructor;

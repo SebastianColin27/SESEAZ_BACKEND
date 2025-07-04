@@ -2,7 +2,6 @@ package com.scspd.backend.controllers;
 
 import com.mongodb.client.gridfs.model.GridFSFile;
 import com.scspd.backend.models.Equipo;
-import com.scspd.backend.repositories.EquipoRepository;
 import com.scspd.backend.services.EquipoService;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
@@ -23,13 +22,11 @@ import java.util.Optional;
 
 @Slf4j
 @RestController
-@CrossOrigin(origins = {"http://localhost:4200", "http://192.168.100.32","https://seseaz-controldeequipos.vercel.app"})
+@CrossOrigin(origins = {"http://localhost:4200", "https://seseaz-controldeequipos.vercel.app"})
 @RequestMapping("/api/equipos")
 public class EquipoController {
     @Autowired
     private EquipoService equipoService;
-    @Autowired
-    private EquipoRepository equipoRepository;
 
 
     @PreAuthorize("hasAnyRole('ADMIN', 'LECTOR', 'MODERADOR')")

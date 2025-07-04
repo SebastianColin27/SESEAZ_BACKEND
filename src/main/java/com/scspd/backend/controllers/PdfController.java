@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@CrossOrigin(origins = {"http://localhost:4200", "http://192.168.100.32","https://seseaz-controldeequipos.vercel.app"})
+@CrossOrigin(origins = {"http://localhost:4200","https://seseaz-controldeequipos.vercel.app"})
 @RequestMapping("/api/pdf")
 
 public class PdfController {
@@ -61,7 +61,7 @@ public class PdfController {
     }
 
     @PreAuthorize("hasAnyRole('ADMIN', 'LECTOR', 'MODERADOR')")
-    @GetMapping("/mantenimientos/equipo/{equipoId}") // Nuevo endpoint para reporte de mantenimientos por equipo
+    @GetMapping("/mantenimientos/equipo/{equipoId}")
     public void generarPdfMantenimientosPorEquipo(HttpServletResponse response, @PathVariable ObjectId equipoId) {
         response.setContentType("application/pdf");
         response.setHeader("Content-Disposition", "attachment; filename=reporte_mantenimientos_equipo_" + equipoId.toHexString() + ".pdf");

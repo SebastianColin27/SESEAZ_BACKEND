@@ -10,7 +10,6 @@ import com.lowagie.text.pdf.PdfWriter;
 import org.apache.commons.io.IOUtils;
 
 import java.awt.*;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 
@@ -60,7 +59,7 @@ public class HeaderFooterPageEvent extends PdfPageEventHelper {
                 headerImage.setAbsolutePosition(headerX, headerY);
                 canvas.addImage(headerImage);
 
-                // Línea justo debajo del logo
+
                 float lineY = y - headerImage.getScaledHeight() + 20;
                 canvas.setLineWidth(1f); // Grosor de la línea
                 canvas.setColorStroke(Color.GRAY); // Color de la línea

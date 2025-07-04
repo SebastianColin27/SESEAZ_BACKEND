@@ -9,7 +9,6 @@ import java.util.List;
 
 public interface MantenimientoRepository extends MongoRepository<Mantenimiento, ObjectId> {
 
-
     List<Mantenimiento> findByEquipoId(ObjectId equipoId);
 
     List<Mantenimiento> findByEquipo(Equipo equipo);

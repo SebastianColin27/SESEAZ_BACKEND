@@ -4,7 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.security.core.GrantedAuthority;
@@ -33,11 +32,11 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        // Si 'role' es tu campo Enum (ADMIN, LECTOR, etc.)
+
         if (this.role == null) {
-            return List.of(); // O lanza una excepción si un usuario SIEMPRE debe tener rol
+            return List.of();
         }
-        // Añade el prefijo "ROLE_" - recomendado para usar hasRole()
+
         return List.of(new SimpleGrantedAuthority("ROLE_" + this.role.name()));
     }
 
