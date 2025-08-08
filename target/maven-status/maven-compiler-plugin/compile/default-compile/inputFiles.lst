@@ -12,6 +12,7 @@ D:\Users\Documentos\8vo\PRACTICAS\authentication\backendSESEAZ\src\main\java\com
 D:\Users\Documentos\8vo\PRACTICAS\authentication\backendSESEAZ\src\main\java\com\scspd\backend\controllers\MantenimientoController.java
 D:\Users\Documentos\8vo\PRACTICAS\authentication\backendSESEAZ\src\main\java\com\scspd\backend\controllers\PdfController.java
 D:\Users\Documentos\8vo\PRACTICAS\authentication\backendSESEAZ\src\main\java\com\scspd\backend\controllers\PersonalController.java
+D:\Users\Documentos\8vo\PRACTICAS\authentication\backendSESEAZ\src\main\java\com\scspd\backend\exception\CustomAuthenticationEntryPoint.java
 D:\Users\Documentos\8vo\PRACTICAS\authentication\backendSESEAZ\src\main\java\com\scspd\backend\exception\GlobalExceptionHandler.java
 D:\Users\Documentos\8vo\PRACTICAS\authentication\backendSESEAZ\src\main\java\com\scspd\backend\jwt\JwtAuthenticationFilter.java
 D:\Users\Documentos\8vo\PRACTICAS\authentication\backendSESEAZ\src\main\java\com\scspd\backend\jwt\JwtService.java

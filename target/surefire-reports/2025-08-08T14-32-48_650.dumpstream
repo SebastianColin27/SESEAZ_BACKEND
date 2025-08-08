@@ -1,0 +1,5 @@
+# Created at 2025-08-08T14:32:49.143
+Boot Manifest-JAR contains absolute paths in classpath 'D:\Users\Documentos\8vo\PRACTICAS\authentication\backendSESEAZ\target\test-classes'
+Hint: <argLine>-Djdk.net.URLClassPath.disableClassPathURLCheck=true</argLine>
+'other' has different root
+

@@ -1,4 +1,5 @@
 com\scspd\backend\controllers\PersonalController.class
+com\scspd\backend\exception\CustomAuthenticationEntryPoint.class
 com\scspd\backend\controllers\LicenciaController.class
 com\scspd\backend\exception\GlobalExceptionHandler.class
 com\scspd\backend\auth\AuthController.class
